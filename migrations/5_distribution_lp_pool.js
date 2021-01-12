@@ -4,6 +4,7 @@ const { POOL_START_DATE } = require('./pools');
 const Cash = artifacts.require('Cash');
 const Share = artifacts.require('Share');
 const Oracle = artifacts.require('Oracle');
+const IERC20 = artifacts.require('IERC20');
 // const MockEURS = artifacts.require('MockEURS');
 
 const EURSBACLPToken_BASPool = artifacts.require('EURSBACLPTokenSharePool')

@@ -11,7 +11,7 @@ module.exports = {
     mainnet: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
     ropsten: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
     rinkeby: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
-    kovan: '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f',
+    kovan: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
   },
   EURS: {
     mainnet: '0xdb25f211ab05b1c97d595516f45794528a807ad8',

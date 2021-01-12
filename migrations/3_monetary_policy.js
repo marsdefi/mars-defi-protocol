@@ -45,6 +45,7 @@ async function migration(deployer, network, accounts) {
   // if you don't provide liquidity to BAC-EURS and BAS-EURS pair after step 1 and before step 3,
   //  creating Oracle will fail with NO_RESERVES error.
   const unit = web3.utils.toBN(10 ** 18).toString();
+  const eursUnit = web3.utils.toBN(10 ** 2).toString();
   const max = web3.utils.toBN(10 ** 18).muln(10000).toString();
 
   const cash = await Cash.deployed();
@@ -54,18 +55,17 @@ async function migration(deployer, network, accounts) {
   await Promise.all([
     approveIfNot(cash, accounts[0], uniswapRouter.address, max),
     approveIfNot(share, accounts[0], uniswapRouter.address, max),
-    // approveIfNot(eurs, accounts[0], uniswapRouter.address, max),
+    approveIfNot(eurs, accounts[0], uniswapRouter.address, max),
   ]);
 
   // WARNING: msg.sender must hold enough EURS to add liquidity to BAC-EURS & BAS-EURS pools
   // otherwise transaction will revert
   console.log('Adding liquidity to pools');
-  console.log('address', cash.address, eurs.address)
   await uniswapRouter.addLiquidity(
-    cash.address, eurs.address, unit, unit, unit, unit, accounts[0], 0,
+    cash.address, eurs.address, unit, eursUnit, unit, eursUnit, accounts[0], deadline(),
   );
   await uniswapRouter.addLiquidity(
-    share.address, eurs.address, unit, unit, unit, unit, accounts[0],  0,
+    share.address, eurs.address, unit, eursUnit, unit, eursUnit, accounts[0],  deadline(),
   );
 
   console.log(`EURS-BAC pair address: ${await uniswap.getPair(eurs.address, cash.address)}`);

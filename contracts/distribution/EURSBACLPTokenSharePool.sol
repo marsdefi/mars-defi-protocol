@@ -64,7 +64,7 @@ import '../interfaces/IRewardDistributionRecipient.sol';
 
 import '../token/LPTokenWrapper.sol';
 
-contract DAIBACLPTokenSharePool is
+contract EURSBACLPTokenSharePool is
     LPTokenWrapper,
     IRewardDistributionRecipient
 {

@@ -1,12 +1,14 @@
 const contract = require('@truffle/contract');
 const { POOL_START_DATE } = require('./pools');
 const knownContracts = require('./known-contracts');
+// const { artifacts } = require('hardhat');
 
 const Cash = artifacts.require('Cash');
 const Bond = artifacts.require('Bond');
 const Share = artifacts.require('Share');
 const IERC20 = artifacts.require('IERC20');
-const MockDai = artifacts.require('MockDai');
+// const MockDai = artifacts.require('MockDai');
+// const MockEURS = artifacts.require('MockEURS');
 
 const Oracle = artifacts.require('Oracle')
 const Boardroom = artifacts.require('Boardroom')
@@ -34,12 +36,13 @@ async function migration(deployer, network, accounts) {
     uniswapRouter = await UniswapV2Router02.at(knownContracts.UniswapV2Router02[network]);
   }
 
-  const dai = network === 'mainnet'
-    ? await IERC20.at(knownContracts.DAI[network])
-    : await MockDai.deployed();
+  // const dai = network === 'mainnet'
+  //   ? await IERC20.at(knownContracts.DAI[network])
+  //   : await MockDai.deployed();
+  const eurs = await IERC20.at(knownContracts.EURS[network])
 
-  // 2. provide liquidity to BAC-DAI and BAS-DAI pair
-  // if you don't provide liquidity to BAC-DAI and BAS-DAI pair after step 1 and before step 3,
+  // 2. provide liquidity to BAC-EURS and BAS-EURS pair
+  // if you don't provide liquidity to BAC-EURS and BAS-EURS pair after step 1 and before step 3,
   //  creating Oracle will fail with NO_RESERVES error.
   const unit = web3.utils.toBN(10 ** 18).toString();
   const max = web3.utils.toBN(10 ** 18).muln(10000).toString();
@@ -51,21 +54,22 @@ async function migration(deployer, network, accounts) {
   await Promise.all([
     approveIfNot(cash, accounts[0], uniswapRouter.address, max),
     approveIfNot(share, accounts[0], uniswapRouter.address, max),
-    approveIfNot(dai, accounts[0], uniswapRouter.address, max),
+    // approveIfNot(eurs, accounts[0], uniswapRouter.address, max),
   ]);
 
-  // WARNING: msg.sender must hold enough DAI to add liquidity to BAC-DAI & BAS-DAI pools
+  // WARNING: msg.sender must hold enough EURS to add liquidity to BAC-EURS & BAS-EURS pools
   // otherwise transaction will revert
   console.log('Adding liquidity to pools');
+  console.log('address', cash.address, eurs.address)
   await uniswapRouter.addLiquidity(
-    cash.address, dai.address, unit, unit, unit, unit, accounts[0], deadline(),
+    cash.address, eurs.address, unit, unit, unit, unit, accounts[0], 0,
   );
   await uniswapRouter.addLiquidity(
-    share.address, dai.address, unit, unit, unit, unit, accounts[0],  deadline(),
+    share.address, eurs.address, unit, unit, unit, unit, accounts[0],  0,
   );
 
-  console.log(`DAI-BAC pair address: ${await uniswap.getPair(dai.address, cash.address)}`);
-  console.log(`DAI-BAS pair address: ${await uniswap.getPair(dai.address, share.address)}`);
+  console.log(`EURS-BAC pair address: ${await uniswap.getPair(eurs.address, cash.address)}`);
+  console.log(`EURS-BAS pair address: ${await uniswap.getPair(eurs.address, share.address)}`);
 
   // Deploy boardroom
   await deployer.deploy(Boardroom, cash.address, share.address);
@@ -73,12 +77,12 @@ async function migration(deployer, network, accounts) {
   // Deploy simpleFund
   await deployer.deploy(SimpleFund);
 
-  // 2. Deploy oracle for the pair between bac and dai
+  // 2. Deploy oracle for the pair between bac and eurs
   const BondOracle = await deployer.deploy(
     Oracle,
     uniswap.address,
     cash.address,
-    dai.address,
+    eurs.address,
     HOUR,
     ORACLE_START_DATE
   );
@@ -86,7 +90,7 @@ async function migration(deployer, network, accounts) {
     Oracle,
     uniswap.address,
     cash.address,
-    dai.address,
+    eurs.address,
     DAY,
     ORACLE_START_DATE
   );

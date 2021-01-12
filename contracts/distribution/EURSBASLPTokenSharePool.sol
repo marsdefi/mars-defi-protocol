@@ -64,7 +64,7 @@ import '../interfaces/IRewardDistributionRecipient.sol';
 
 import '../token/LPTokenWrapper.sol';
 
-contract DAIBASLPTokenSharePool is
+contract EURSBASLPTokenSharePool is
     LPTokenWrapper,
     IRewardDistributionRecipient
 {
@@ -97,7 +97,7 @@ contract DAIBASLPTokenSharePool is
     modifier checkStart() {
         require(
             block.timestamp >= starttime,
-            'DAIBASLPTokenSharePool: not start'
+            'EURSBASLPTokenSharePool: not start'
         );
         _;
     }
@@ -145,7 +145,7 @@ contract DAIBASLPTokenSharePool is
         updateReward(msg.sender)
         checkStart
     {
-        require(amount > 0, 'DAIBASLPTokenSharePool: Cannot stake 0');
+        require(amount > 0, 'EURSBASLPTokenSharePool: Cannot stake 0');
         super.stake(amount);
         emit Staked(msg.sender, amount);
     }
@@ -156,7 +156,7 @@ contract DAIBASLPTokenSharePool is
         updateReward(msg.sender)
         checkStart
     {
-        require(amount > 0, 'DAIBASLPTokenSharePool: Cannot withdraw 0');
+        require(amount > 0, 'EURSBASLPTokenSharePool: Cannot withdraw 0');
         super.withdraw(amount);
         emit Withdrawn(msg.sender, amount);
     }

@@ -1,7 +1,7 @@
 const {
   basPools,
-  INITIAL_BAS_FOR_DAI_BAC,
-  INITIAL_BAS_FOR_DAI_BAS,
+  INITIAL_BAS_FOR_EURS_BAC,
+  INITIAL_BAS_FOR_EURS_BAS,
 } = require('./pools');
 
 // Pools
@@ -13,31 +13,31 @@ const InitialShareDistributor = artifacts.require('InitialShareDistributor');
 
 async function migration(deployer, network, accounts) {
   const unit = web3.utils.toBN(10 ** 18);
-  const totalBalanceForDAIBAC = unit.muln(INITIAL_BAS_FOR_DAI_BAC)
-  const totalBalanceForDAIBAS = unit.muln(INITIAL_BAS_FOR_DAI_BAS)
-  const totalBalance = totalBalanceForDAIBAC.add(totalBalanceForDAIBAS);
+  const totalBalanceForEURSBAC = unit.muln(INITIAL_BAS_FOR_EURS_BAC)
+  const totalBalanceForEURSBAS = unit.muln(INITIAL_BAS_FOR_EURS_BAS)
+  const totalBalance = totalBalanceForEURSBAC.add(totalBalanceForEURSBAS);
 
   const share = await Share.deployed();
 
-  const lpPoolDAIBAC = artifacts.require(basPools.DAIBAC.contractName);
-  const lpPoolDAIBAS = artifacts.require(basPools.DAIBAS.contractName);
+  const lpPoolEURSBAC = artifacts.require(basPools.EURSBAC.contractName);
+  const lpPoolEURSBAS = artifacts.require(basPools.EURSBAS.contractName);
 
   await deployer.deploy(
     InitialShareDistributor,
     share.address,
-    lpPoolDAIBAC.address,
-    totalBalanceForDAIBAC.toString(),
-    lpPoolDAIBAS.address,
-    totalBalanceForDAIBAS.toString(),
+    lpPoolEURSBAC.address,
+    totalBalanceForEURSBAC.toString(),
+    lpPoolEURSBAS.address,
+    totalBalanceForEURSBAS.toString(),
   );
   const distributor = await InitialShareDistributor.deployed();
 
   await share.mint(distributor.address, totalBalance.toString());
-  console.log(`Deposited ${INITIAL_BAS_FOR_DAI_BAC} BAS to InitialShareDistributor.`);
+  console.log(`Deposited ${INITIAL_BAS_FOR_EURS_BAC} BAS to InitialShareDistributor.`);
 
   console.log(`Setting distributor to InitialShareDistributor (${distributor.address})`);
-  await lpPoolDAIBAC.deployed().then(pool => pool.setRewardDistribution(distributor.address));
-  await lpPoolDAIBAS.deployed().then(pool => pool.setRewardDistribution(distributor.address));
+  await lpPoolEURSBAC.deployed().then(pool => pool.setRewardDistribution(distributor.address));
+  await lpPoolEURSBAS.deployed().then(pool => pool.setRewardDistribution(distributor.address));
 
   await distributor.distribute();
 }

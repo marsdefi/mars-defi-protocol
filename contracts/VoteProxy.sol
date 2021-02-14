@@ -1,8 +1,9 @@
-pragma solidity ^0.6.0;
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.7.0 <0.8.0;
 
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
-import './owner/Operator.sol';
+import './access/Operator.sol';
 
 contract VoteProxy is Operator {
     // Events
@@ -15,14 +16,14 @@ contract VoteProxy is Operator {
     // Boardroom
     address public boardroom;
 
-    constructor(address _boardroom) public {
+    constructor(address _boardroom) {
         boardroom = _boardroom;
     }
 
     function setBoardroom(address newBoardroom) public onlyOperator {
         address oldBoardroom = boardroom;
         boardroom = newBoardroom;
-        emit BoardroomChanged(msg.sender, oldBoardroom, newBoardroom);
+        emit BoardroomChanged(_msgSender(), oldBoardroom, newBoardroom);
     }
 
     function decimals() external pure returns (uint8) {
@@ -30,11 +31,11 @@ contract VoteProxy is Operator {
     }
 
     function name() external pure returns (string memory) {
-        return 'BAS in Boardroom';
+        return 'SMARS in Boardroom';
     }
 
     function symbol() external pure returns (string memory) {
-        return 'SBAS';
+        return 'SSMARS';
     }
 
     function totalSupply() external view returns (uint256) {
